@@ -1,3 +1,14 @@
+
+<p align="center">
+  <img src="https://assets.devsandboxhub.shop/appcurfew/app_curfew_logo.png" alt="AppCurfew Logo" width="120" />
+</p>
+
+<h1 align="center">AppCurfew</h1>
+
+<p align="center">
+  Take control of your screen time
+</p>
+
 # AppCurfew
 
 AppCurfew is an Android app designed to help you regain control over your screen time by enforcing strict app usage boundaries during specific time periods.
