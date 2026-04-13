@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">AppCurfew</string>
+    <string name="bedtime_blocker">Bedtime Blocker</string>
+    <string name="bedtime_description">Block selected apps during your bedtime window while always allowing phone and contacts.</string>
+    <string name="enable_blocking">Enable blocking</string>
+    <string name="select_blocked_apps">Select blocked apps</string>
+    <string name="open_accessibility_settings">Open accessibility settings</string>
+    <string name="accessibility_help">Enable the Bedtime Blocker accessibility service to enforce blocking.</string>
+    <string name="whitelist_summary">%1$d blocked apps selected. Blocking is %2$s.</string>
+    <string name="enabled">enabled</string>
+    <string name="disabled">disabled</string>
+    <string name="selected_apps_saved">Blocked apps saved</string>
+    <string name="save">Save</string>
+</resources>
