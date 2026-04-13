@@ -16,4 +16,12 @@
     <string name="selected_apps_saved">Blocked apps saved</string>
     <string name="save">Save</string>
     <string name="search_apps">Search apps</string>
+    <string name="selected_count">%1$d selected</string>
+    <string name="selected_count_default">0 selected</string>
+    <string name="blocked_apps_title">Blocked apps</string>
+    <string name="blocked_apps_empty">No apps selected yet</string>
+    <string name="start_time_label">Start time</string>
+    <string name="end_time_label">End time</string>
+    <string name="am">AM</string>
+    <string name="pm">PM</string>
 </resources>

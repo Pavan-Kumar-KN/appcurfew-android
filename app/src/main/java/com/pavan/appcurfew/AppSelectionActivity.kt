@@ -16,6 +16,7 @@ import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textfield.TextInputEditText
 
 class AppSelectionActivity : AppCompatActivity() {
@@ -33,12 +34,15 @@ class AppSelectionActivity : AppCompatActivity() {
         val listView = findViewById<ListView>(R.id.listApps)
         val saveButton = findViewById<Button>(R.id.buttonSaveBlockedApps)
         val searchInput = findViewById<TextInputEditText>(R.id.searchApps)
+        val selectedCount = findViewById<TextView>(R.id.textSelectedCount)
 
         title = getString(R.string.select_apps_title)
 
         apps.addAll(loadLaunchableApps())
         filteredApps.addAll(apps)
-        adapter = AppListAdapter(filteredApps)
+        adapter = AppListAdapter(filteredApps) {
+            updateSelectedCount(selectedCount)
+        }
         listView.adapter = adapter
         listView.choiceMode = ListView.CHOICE_MODE_MULTIPLE
 
@@ -53,6 +57,7 @@ class AppSelectionActivity : AppCompatActivity() {
         listView.setOnItemClickListener { _, _, position, _ ->
             filteredApps[position].checked = !filteredApps[position].checked
             adapter.notifyDataSetChanged()
+            updateSelectedCount(selectedCount)
         }
 
         searchInput.addTextChangedListener(object : TextWatcher {
@@ -71,6 +76,8 @@ class AppSelectionActivity : AppCompatActivity() {
             Toast.makeText(this, R.string.selected_apps_saved, Toast.LENGTH_SHORT).show()
             finish()
         }
+
+        updateSelectedCount(selectedCount)
     }
 
     private fun loadLaunchableApps(): List<SelectableApp> {
@@ -103,6 +110,11 @@ class AppSelectionActivity : AppCompatActivity() {
         adapter.notifyDataSetChanged()
     }
 
+    private fun updateSelectedCount(selectedCountView: TextView) {
+        val count = apps.count { it.checked }
+        selectedCountView.text = getString(R.string.selected_count, count)
+    }
+
     private data class SelectableApp(
         val packageName: String,
         val label: String,
@@ -111,7 +123,8 @@ class AppSelectionActivity : AppCompatActivity() {
     )
 
     private class AppListAdapter(
-        private val items: List<SelectableApp>
+        private val items: List<SelectableApp>,
+        private val onSelectionChanged: () -> Unit
     ) : BaseAdapter() {
 
         override fun getCount(): Int = items.size
@@ -123,6 +136,7 @@ class AppSelectionActivity : AppCompatActivity() {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val view = convertView ?: LayoutInflater.from(parent.context)
                 .inflate(R.layout.row_app_item, parent, false)
+            val card = view.findViewById<MaterialCardView>(R.id.cardRow)
             val icon = view.findViewById<ImageView>(R.id.imageAppIcon)
             val title = view.findViewById<TextView>(R.id.textAppName)
             val packageText = view.findViewById<TextView>(R.id.textAppPackage)
@@ -134,14 +148,40 @@ class AppSelectionActivity : AppCompatActivity() {
             packageText.text = item.packageName
             checkbox.setOnCheckedChangeListener(null)
             checkbox.isChecked = item.checked
-            checkbox.setOnCheckedChangeListener { _, isChecked -> item.checked = isChecked }
+            checkbox.setOnCheckedChangeListener { _, isChecked ->
+                item.checked = isChecked
+                syncRowCardState(card, isChecked)
+                onSelectionChanged()
+            }
+
+            syncRowCardState(card, item.checked)
 
             view.setOnClickListener {
                 item.checked = !item.checked
+                checkbox.isChecked = item.checked
+                syncRowCardState(card, item.checked)
+                onSelectionChanged()
                 notifyDataSetChanged()
             }
 
             return view
+        }
+
+        private fun syncRowCardState(card: MaterialCardView, isChecked: Boolean) {
+            val context = card.context
+            val strokeColor = if (isChecked) {
+                context.getColor(R.color.app_primary)
+            } else {
+                context.getColor(R.color.app_surface_variant)
+            }
+            val backgroundColor = if (isChecked) {
+                context.getColor(R.color.app_primary_container)
+            } else {
+                context.getColor(R.color.app_surface_variant)
+            }
+            card.setCardBackgroundColor(backgroundColor)
+            card.strokeColor = strokeColor
+            card.strokeWidth = if (isChecked) (2 * context.resources.displayMetrics.density).toInt() else context.resources.displayMetrics.density.toInt()
         }
     }
 }

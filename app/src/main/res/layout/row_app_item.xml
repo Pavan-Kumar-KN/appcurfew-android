@@ -1,48 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardRow"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white"
-    android:padding="12dp">
+    app:cardBackgroundColor="@color/app_surface_variant"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/app_surface_variant"
+    app:strokeWidth="1dp">
 
-    <ImageView
-        android:id="@+id/imageAppIcon"
-        android:layout_width="44dp"
-        android:layout_height="44dp"
-        android:contentDescription="App icon"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/textAppName"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:textColor="@android:color/black"
-        android:textAppearance="?attr/textAppearanceTitleMedium"
-        app:layout_constraintEnd_toStartOf="@id/checkboxApp"
-        app:layout_constraintStart_toEndOf="@id/imageAppIcon"
-        app:layout_constraintTop_toTopOf="@id/imageAppIcon" />
+        android:padding="12dp">
 
-    <TextView
-        android:id="@+id/textAppPackage"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:textColor="#7A7A7A"
-        android:textAppearance="?attr/textAppearanceBodySmall"
-        app:layout_constraintEnd_toStartOf="@id/checkboxApp"
-        app:layout_constraintStart_toEndOf="@id/imageAppIcon"
-        app:layout_constraintTop_toBottomOf="@id/textAppName" />
+        <ImageView
+            android:id="@+id/imageAppIcon"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:contentDescription="App icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <CheckBox
-        android:id="@+id/checkboxApp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/textAppName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textColor="@color/app_on_background"
+            app:layout_constraintEnd_toStartOf="@id/checkboxApp"
+            app:layout_constraintStart_toEndOf="@id/imageAppIcon"
+            app:layout_constraintTop_toTopOf="@id/imageAppIcon" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/textAppPackage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="@color/app_on_surface_variant"
+            app:layout_constraintEnd_toStartOf="@id/checkboxApp"
+            app:layout_constraintStart_toEndOf="@id/imageAppIcon"
+            app:layout_constraintTop_toBottomOf="@id/textAppName" />
+
+        <CheckBox
+            android:id="@+id/checkboxApp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/app_primary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -4,14 +4,19 @@ import android.app.TimePickerDialog
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.NameNotFoundException
+import android.graphics.drawable.Drawable
 import android.provider.Settings
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.materialswitch.MaterialSwitch
@@ -25,6 +30,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var selectAppsButton: Button
     private lateinit var accessibilityButton: Button
     private lateinit var whitelistSummary: TextView
+    private lateinit var blockedAppsGroup: ChipGroup
+    private lateinit var blockedAppsEmpty: TextView
     private var accessibilityPromptShown = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,11 +46,14 @@ class MainActivity : AppCompatActivity() {
         selectAppsButton = findViewById(R.id.buttonSelectApps)
         accessibilityButton = findViewById(R.id.buttonAccessibilitySettings)
         whitelistSummary = findViewById(R.id.textWhitelistSummary)
+        blockedAppsGroup = findViewById(R.id.blockedAppsGroup)
+        blockedAppsEmpty = findViewById(R.id.blockedAppsEmpty)
 
         enableSwitch.isChecked = prefs.isBlockingEnabled()
         startTimeButton.text = formatMinutes(prefs.getStartMinutes())
         endTimeButton.text = formatMinutes(prefs.getEndMinutes())
         updateSummary()
+        renderBlockedApps()
 
         enableSwitch.setOnCheckedChangeListener { _, isChecked ->
             prefs.setBlockingEnabled(isChecked)
@@ -55,6 +65,7 @@ class MainActivity : AppCompatActivity() {
                 prefs.setStartMinutes(it)
                 startTimeButton.text = formatMinutes(it)
                 updateSummary()
+                renderBlockedApps()
             }
         }
 
@@ -63,6 +74,7 @@ class MainActivity : AppCompatActivity() {
                 prefs.setEndMinutes(it)
                 endTimeButton.text = formatMinutes(it)
                 updateSummary()
+                renderBlockedApps()
             }
         }
 
@@ -88,6 +100,7 @@ class MainActivity : AppCompatActivity() {
         startTimeButton.text = formatMinutes(prefs.getStartMinutes())
         endTimeButton.text = formatMinutes(prefs.getEndMinutes())
         updateSummary()
+        renderBlockedApps()
         showAccessibilityPromptIfNeeded()
     }
 
@@ -106,13 +119,63 @@ class MainActivity : AppCompatActivity() {
             { _, selectedHour, selectedMinute -> onSelected(selectedHour * 60 + selectedMinute) },
             initialMinutes / 60,
             initialMinutes % 60,
-            true
+            false
         ).show()
     }
 
     private fun formatMinutes(minutesOfDay: Int): String {
-        return String.format("%02d:%02d", minutesOfDay / 60, minutesOfDay % 60)
+        val hour24 = minutesOfDay / 60
+        val minute = minutesOfDay % 60
+        val suffix = if (hour24 >= 12) getString(R.string.pm) else getString(R.string.am)
+        val normalizedHour = hour24 % 12
+        val hour12 = if (normalizedHour == 0) 12 else normalizedHour
+        return String.format("%d:%02d %s", hour12, minute, suffix)
     }
+
+    private fun renderBlockedApps() {
+        blockedAppsGroup.removeAllViews()
+        val blockedPackages = prefs.getBlockedPackages()
+
+        blockedAppsEmpty.visibility = if (blockedPackages.isEmpty()) View.VISIBLE else View.GONE
+        blockedAppsGroup.visibility = if (blockedPackages.isEmpty()) View.GONE else View.VISIBLE
+
+        blockedPackages
+            .mapNotNull { packageName -> resolveAppLabel(packageName) }
+            .sortedBy { it.label.lowercase() }
+            .forEach { item ->
+                val chip = Chip(this).apply {
+                    text = item.label
+                    isCheckable = false
+                    isClickable = false
+                    setTextColor(resources.getColor(R.color.app_on_background, theme))
+                    chipBackgroundColor = resources.getColorStateList(R.color.app_primary_container, theme)
+                    chipStrokeColor = resources.getColorStateList(R.color.app_primary, theme)
+                    chipStrokeWidth = resources.displayMetrics.density
+                    chipIcon = item.icon
+                    isChipIconVisible = item.icon != null
+                    chipIconTint = null
+                    contentDescription = "${item.label} ${item.packageName}"
+                }
+                blockedAppsGroup.addView(chip)
+            }
+    }
+
+    private fun resolveAppLabel(packageName: String): BlockedAppUi? {
+        return try {
+            val applicationInfo = packageManager.getApplicationInfo(packageName, 0)
+            val label = packageManager.getApplicationLabel(applicationInfo).toString()
+            val icon = packageManager.getApplicationIcon(applicationInfo)
+            BlockedAppUi(label = label, packageName = packageName, icon = icon)
+        } catch (_: NameNotFoundException) {
+            null
+        }
+    }
+
+    private data class BlockedAppUi(
+        val label: String,
+        val packageName: String,
+        val icon: Drawable?
+    )
 
     private fun showAccessibilityPromptIfNeeded() {
         if (accessibilityPromptShown || isAccessibilityServiceEnabled()) {
