@@ -82,23 +82,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
+        // Use setOnClickListener for the master toggle to intercept clicks before they change the check state
         enableSwitch.setOnClickListener {
-            val isCurrentlyEnabled = prefs.isBlockingEnabled()
+            val isCurrentlyChecked = enableSwitch.isChecked
+            val wasEnabled = prefs.isBlockingEnabled()
             val isBedtime = prefs.isWithinActiveWindow()
 
-            if (isCurrentlyEnabled && isBedtime) {
-                // Intercept disabling during bedtime
+            if (wasEnabled && isBedtime && !isCurrentlyChecked && !prefs.isOverrideActive()) {
+                // Intercept manual disable during bedtime: Force it back to ON and show protection
                 enableSwitch.isChecked = true
                 showDisableProtectionDialog()
             } else {
-                val newState = !isCurrentlyEnabled
-                if (newState && prefs.getPinCode() == null) {
+                // Normal toggle behavior
+                if (isCurrentlyChecked && prefs.getPinCode() == null) {
+                    // First time enable: Setup PIN
+                    enableSwitch.isChecked = false // Reset until PIN is set
                     showSetupPinDialog {
                         prefs.setBlockingEnabled(true)
                         updateUIState()
                     }
                 } else {
-                    prefs.setBlockingEnabled(newState)
+                    prefs.setBlockingEnabled(isCurrentlyChecked)
                     updateUIState()
                 }
             }
@@ -142,7 +146,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateUIState() {
         val isEnabled = prefs.isBlockingEnabled()
+        
         enableSwitch.isChecked = isEnabled
+
         startTimeButton.text = formatMinutes(prefs.getStartMinutes())
         endTimeButton.text = formatMinutes(prefs.getEndMinutes())
         
@@ -190,7 +196,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         cancelBtn.setOnClickListener { 
-            enableSwitch.isChecked = false
+            updateUIState()
             dialog.dismiss() 
         }
     }
@@ -203,7 +209,7 @@ class MainActivity : AppCompatActivity() {
         val confirmBtn = view.findViewById<Button>(R.id.buttonConfirmDisable)
         val cancelBtn = view.findViewById<Button>(R.id.buttonCancelDisable)
 
-        confirmBtn.text = getString(R.string.save) // Initial state: "Verify" or "Save"
+        confirmBtn.text = getString(R.string.save) 
         confirmBtn.isEnabled = false
 
         val dialog = MaterialAlertDialogBuilder(this)
@@ -222,7 +228,6 @@ class MainActivity : AppCompatActivity() {
         confirmBtn.setOnClickListener {
             val enteredPin = pinInput.text.toString()
             if (enteredPin == prefs.getPinCode()) {
-                // PIN correct, start friction
                 pinLayout.visibility = View.GONE
                 countdownText.visibility = View.VISIBLE
                 confirmBtn.isEnabled = false
@@ -237,9 +242,8 @@ class MainActivity : AppCompatActivity() {
                         confirmBtn.isEnabled = true
                         confirmBtn.text = getString(R.string.confirm_disable)
                         confirmBtn.setOnClickListener {
-                            // Final Disable Logic
                             prefs.setOverrideActive(true)
-                            prefs.setOverrideEndTime(System.currentTimeMillis() + 10 * 60 * 1000) // 10 mins
+                            prefs.setOverrideEndTime(System.currentTimeMillis() + 10 * 60 * 1000)
                             prefs.setBlockingEnabled(false)
                             updateUIState()
                             Toast.makeText(this@MainActivity, R.string.override_active_msg, Toast.LENGTH_LONG).show()
@@ -252,7 +256,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        cancelBtn.setOnClickListener { dialog.dismiss() }
+        cancelBtn.setOnClickListener { 
+            updateUIState()
+            dialog.dismiss() 
+        }
     }
 
     private fun updateAccessibilityButtonVisibility() {

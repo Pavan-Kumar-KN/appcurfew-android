@@ -8,22 +8,40 @@ class BedtimePrefs(context: Context) {
 
     private val preferences: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
+    /**
+     * Returns whether blocking is logically enabled.
+     * This considers the master switch and any active overrides during bedtime.
+     */
     fun isBlockingEnabled(): Boolean {
-        if (!isWithinActiveWindow()) return preferences.getBoolean(KEY_ENABLED, false)
+        val masterEnabled = preferences.getBoolean(KEY_ENABLED, false)
+        if (!masterEnabled) return false
+        
+        if (!isWithinActiveWindow()) return true
         
         // If within active window, check if override is active
         if (isOverrideActive()) {
-            if (System.currentTimeMillis() > getOverrideEndTime()) {
+            val endTime = getOverrideEndTime()
+            if (System.currentTimeMillis() > endTime) {
+                // Override expired, re-enable protection (clear override)
                 setOverrideActive(false)
-                setBlockingEnabled(true)
                 return true
             }
+            // Override still active, logically disabled
             return false
         }
-        return preferences.getBoolean(KEY_ENABLED, false)
+        
+        return true
     }
 
+    /**
+     * Sets the master switch state.
+     * If enabling, we clear any active overrides to ensure protection starts immediately.
+     */
     fun setBlockingEnabled(enabled: Boolean) {
+        if (enabled) {
+            // If the user manually turns it ON, clear any existing overrides
+            setOverrideActive(false)
+        }
         preferences.edit().putBoolean(KEY_ENABLED, enabled).apply()
     }
 
@@ -55,6 +73,9 @@ class BedtimePrefs(context: Context) {
 
     fun setOverrideActive(active: Boolean) {
         preferences.edit().putBoolean(KEY_OVERRIDE_ACTIVE, active).apply()
+        if (!active) {
+            preferences.edit().putLong(KEY_OVERRIDE_END_TIME, 0L).apply()
+        }
     }
 
     fun getOverrideEndTime(): Long = preferences.getLong(KEY_OVERRIDE_END_TIME, 0L)
