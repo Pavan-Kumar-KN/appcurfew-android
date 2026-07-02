@@ -1,6 +1,7 @@
 package com.pavan.appcurfew
 
 import android.accessibilityservice.AccessibilityService
+import android.content.Intent
 import android.view.accessibility.AccessibilityEvent
 
 class AppBlockAccessibilityService : AccessibilityService() {
@@ -27,7 +28,16 @@ class AppBlockAccessibilityService : AccessibilityService() {
 
             lastBlockedPackage = packageName
             lastBlockedAtMillis = now
-            performGlobalAction(GLOBAL_ACTION_HOME)
+            
+            // Increment attempt count
+            prefs.incrementAttemptCount(packageName)
+            
+            // Launch Warning Activity
+            val intent = Intent(this, BlockedWarningActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                putExtra(BlockedWarningActivity.EXTRA_PACKAGE_NAME, packageName)
+            }
+            startActivity(intent)
         }
     }
 

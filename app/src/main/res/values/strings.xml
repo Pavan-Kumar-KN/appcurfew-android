@@ -36,4 +36,27 @@
     <string name="wrong_pin">Incorrect PIN. Try again.</string>
     <string name="wait_seconds">Wait %d seconds…</string>
     <string name="override_active_msg">Blocking temporarily disabled for 10 minutes.</string>
+
+    <!-- Harsh Warning Strings -->
+    <string name="harsh_message_1">You are wasting your life watching others get rich while you stay a loser. Get back to work.</string>
+    <string name="harsh_message_2">Every second you spend here is a second you\'re not building your future. You are nothing if you can\'t control yourself.</string>
+    <string name="harsh_message_3">Stop chasing pixels and start chasing your dreams. Don\'t be a slave to an app.</string>
+    <string name="harsh_message_4">They are making money off your attention. You are getting nothing but a wasted life. Close it.</string>
+    <string name="harsh_message_5">Is this really who you want to be? Someone who can\'t even stick to their own rules? Be better.</string>
+    <string name="harsh_message_6">While you waste time here, your competitors are outworking you. Wake up.</string>
+    <string name="harsh_message_7">Your future self is watching you right now through memories. Do you want to be remembered as a coward who gave in to an app?</string>
+    <string name="harsh_message_8">Discipline is the bridge between goals and accomplishment. You just burned that bridge.</string>
+    <string name="harsh_message_9">Stop scrolling through other people\'s highlights and start living your own life.</string>
+    <string name="harsh_message_10">You have 24 hours in a day. You just threw one more away for a hit of dopamine. Pathetic.</string>
+
+    <string name="app_attempt_count">Attempted to open this app %1$d times today.</string>
+    <string name="total_attempt_count">Total failed attempts today: %1$d</string>
+    <string name="blocked_warning_title">BLOCKED!</string>
+    <string name="return_home">Go back to reality</string>
+    <string name="emergency_override">Emergency Override</string>
+    <string name="session_status">Session active until %1$s. Ends in %2$d mins.</string>
+    <string name="question_progress">Question %1$d/%2$d</string>
+    <string name="difficulty_tier">Difficulty: Tier %1$d</string>
+    <string name="answer_hint">Answer</string>
+    <string name="emergency_access_granted">Emergency Access Granted for 10 Mins</string>
 </resources>
