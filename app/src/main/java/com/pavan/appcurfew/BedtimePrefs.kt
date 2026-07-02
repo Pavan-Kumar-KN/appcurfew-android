@@ -86,6 +86,39 @@ class BedtimePrefs(context: Context) {
         return getAttemptCountsMap().values.sum()
     }
 
+    fun getOverrideAttemptCount(): Int {
+        checkAndResetDailyCounts()
+        return preferences.getInt(KEY_OVERRIDE_ATTEMPT_COUNT, 0)
+    }
+
+    fun incrementOverrideAttemptCount() {
+        checkAndResetDailyCounts()
+        val current = getOverrideAttemptCount()
+        preferences.edit().putInt(KEY_OVERRIDE_ATTEMPT_COUNT, current + 1).apply()
+    }
+
+    fun resetOverrideAttemptCount() {
+        preferences.edit().putInt(KEY_OVERRIDE_ATTEMPT_COUNT, 0).apply()
+    }
+
+    fun getRemainingMinutesUntilUnlock(): Int {
+        if (!isWithinActiveWindow()) return 0
+        
+        val now = currentMinutesOfDay()
+        val end = getEndMinutes()
+        
+        return if (getStartMinutes() > end) {
+            // Overlapping midnight
+            if (now >= getStartMinutes()) {
+                (1440 - now) + end
+            } else {
+                end - now
+            }
+        } else {
+            end - now
+        }
+    }
+
     private fun getAttemptCountsMap(): Map<String, Int> {
         val serialized = preferences.getString(KEY_ATTEMPT_COUNTS, "") ?: ""
         if (serialized.isEmpty()) return emptyMap()
@@ -112,6 +145,7 @@ class BedtimePrefs(context: Context) {
         if (lastResetDay != currentDay) {
             preferences.edit()
                 .putString(KEY_ATTEMPT_COUNTS, "")
+                .putInt(KEY_OVERRIDE_ATTEMPT_COUNT, 0)
                 .putInt(KEY_LAST_RESET_DAY, currentDay)
                 .apply()
         }
@@ -153,6 +187,7 @@ class BedtimePrefs(context: Context) {
         private const val KEY_OVERRIDE_END_TIME = "override_end_time"
         private const val KEY_ATTEMPT_COUNTS = "attempt_counts"
         private const val KEY_LAST_RESET_DAY = "last_reset_day"
+        private const val KEY_OVERRIDE_ATTEMPT_COUNT = "override_attempt_count"
     }
 }
 

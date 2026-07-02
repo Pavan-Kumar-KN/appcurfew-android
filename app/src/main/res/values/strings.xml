@@ -53,4 +53,10 @@
     <string name="total_attempt_count">Total failed attempts today: %1$d</string>
     <string name="blocked_warning_title">BLOCKED!</string>
     <string name="return_home">Go back to reality</string>
+    <string name="emergency_override">Emergency Override</string>
+    <string name="session_status">Session active until %1$s. Ends in %2$d mins.</string>
+    <string name="question_progress">Question %1$d/%2$d</string>
+    <string name="difficulty_tier">Difficulty: Tier %1$d</string>
+    <string name="answer_hint">Answer</string>
+    <string name="emergency_access_granted">Emergency Access Granted for 10 Mins</string>
 </resources>

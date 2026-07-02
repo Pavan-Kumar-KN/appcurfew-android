@@ -59,6 +59,33 @@
         app:layout_constraintTop_toBottomOf="@id/textAppAttemptCount"
         tools:text="Total failed attempts today: 23" />
 
+    <TextView
+        android:id="@+id/textSessionStatus"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textTotalAttemptCount"
+        tools:text="Session active until 6:00 AM. Ends in 47 mins." />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonEmergencyOverride"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="@string/emergency_override"
+        android:textColor="@color/white"
+        android:alpha="0.6"
+        app:layout_constraintBottom_toTopOf="@+id/buttonReturnHome"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/buttonReturnHome"
         android:layout_width="match_parent"

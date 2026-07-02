@@ -54,6 +54,21 @@ class BlockedWarningActivity : AppCompatActivity() {
         val totalAttempts = prefs.getTotalAttemptCount()
         findViewById<TextView>(R.id.textTotalAttemptCount).text = getString(R.string.total_attempt_count, totalAttempts)
 
+        val endMinutes = prefs.getEndMinutes()
+        val hour24 = endMinutes / 60
+        val minute = endMinutes % 60
+        val suffix = if (hour24 >= 12) "PM" else "AM"
+        val hour12 = if (hour24 % 12 == 0) 12 else hour24 % 12
+        val endTimeStr = String.format("%d:%02d %s", hour12, minute, suffix)
+        
+        val remaining = prefs.getRemainingMinutesUntilUnlock()
+        findViewById<TextView>(R.id.textSessionStatus).text = getString(R.string.session_status, endTimeStr, remaining)
+
+        findViewById<Button>(R.id.buttonEmergencyOverride).setOnClickListener {
+            startActivity(Intent(this, EmergencyOverrideActivity::class.java))
+            finish()
+        }
+
         findViewById<Button>(R.id.buttonReturnHome).setOnClickListener {
             val startMain = Intent(Intent.ACTION_MAIN)
             startMain.addCategory(Intent.CATEGORY_HOME)
