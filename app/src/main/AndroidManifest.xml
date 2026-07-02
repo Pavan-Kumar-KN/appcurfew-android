@@ -26,6 +26,11 @@
             android:name=".AppSelectionActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".BlockedWarningActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCurfew.Warning" />
+
         <service
             android:name=".AppBlockAccessibilityService"
             android:exported="false"

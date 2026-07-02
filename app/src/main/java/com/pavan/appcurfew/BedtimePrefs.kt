@@ -69,6 +69,54 @@ class BedtimePrefs(context: Context) {
         preferences.edit().putString(KEY_PIN_CODE, pin).apply()
     }
 
+    fun incrementAttemptCount(packageName: String) {
+        checkAndResetDailyCounts()
+        val counts = getAttemptCountsMap().toMutableMap()
+        counts[packageName] = (counts[packageName] ?: 0) + 1
+        saveAttemptCountsMap(counts)
+    }
+
+    fun getAttemptCount(packageName: String): Int {
+        checkAndResetDailyCounts()
+        return getAttemptCountsMap()[packageName] ?: 0
+    }
+
+    fun getTotalAttemptCount(): Int {
+        checkAndResetDailyCounts()
+        return getAttemptCountsMap().values.sum()
+    }
+
+    private fun getAttemptCountsMap(): Map<String, Int> {
+        val serialized = preferences.getString(KEY_ATTEMPT_COUNTS, "") ?: ""
+        if (serialized.isEmpty()) return emptyMap()
+        
+        return serialized.split(",").associate {
+            val parts = it.split(":")
+            if (parts.size == 2) {
+                parts[0] to (parts[1].toIntOrNull() ?: 0)
+            } else {
+                "" to 0
+            }
+        }.filter { it.key.isNotEmpty() }
+    }
+
+    private fun saveAttemptCountsMap(counts: Map<String, Int>) {
+        val serialized = counts.entries.joinToString(",") { "${it.key}:${it.value}" }
+        preferences.edit().putString(KEY_ATTEMPT_COUNTS, serialized).apply()
+    }
+
+    private fun checkAndResetDailyCounts() {
+        val lastResetDay = preferences.getInt(KEY_LAST_RESET_DAY, -1)
+        val currentDay = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
+        
+        if (lastResetDay != currentDay) {
+            preferences.edit()
+                .putString(KEY_ATTEMPT_COUNTS, "")
+                .putInt(KEY_LAST_RESET_DAY, currentDay)
+                .apply()
+        }
+    }
+
     fun isOverrideActive(): Boolean = preferences.getBoolean(KEY_OVERRIDE_ACTIVE, false)
 
     fun setOverrideActive(active: Boolean) {
@@ -103,6 +151,8 @@ class BedtimePrefs(context: Context) {
         private const val KEY_PIN_CODE = "pin_code"
         private const val KEY_OVERRIDE_ACTIVE = "override_active"
         private const val KEY_OVERRIDE_END_TIME = "override_end_time"
+        private const val KEY_ATTEMPT_COUNTS = "attempt_counts"
+        private const val KEY_LAST_RESET_DAY = "last_reset_day"
     }
 }
 

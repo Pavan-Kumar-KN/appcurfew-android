@@ -16,4 +16,11 @@
     </style>
 
     <style name="Theme.AppCurfew" parent="Base.Theme.AppCurfew" />
+
+    <style name="Theme.AppCurfew.Warning" parent="Base.Theme.AppCurfew">
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowBackground">@color/black</item>
+        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:navigationBarColor">@color/black</item>
+    </style>
 </resources>

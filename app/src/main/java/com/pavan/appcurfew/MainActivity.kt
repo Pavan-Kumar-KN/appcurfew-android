@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var selectAppsButton: Button
     private lateinit var accessibilityButton: Button
     private lateinit var whitelistSummary: TextView
+    private lateinit var totalAttemptsText: TextView
     private lateinit var overrideStatusText: TextView
     private lateinit var blockedAppsGroup: ChipGroup
     private lateinit var blockedAppsEmpty: TextView
@@ -66,6 +67,7 @@ class MainActivity : AppCompatActivity() {
         selectAppsButton = findViewById(R.id.buttonSelectApps)
         accessibilityButton = findViewById(R.id.buttonAccessibilitySettings)
         whitelistSummary = findViewById(R.id.textWhitelistSummary)
+        totalAttemptsText = findViewById(R.id.textTotalAttempts)
         overrideStatusText = findViewById(R.id.textOverrideStatus)
         blockedAppsGroup = findViewById(R.id.blockedAppsGroup)
         blockedAppsEmpty = findViewById(R.id.blockedAppsEmpty)
@@ -174,6 +176,14 @@ class MainActivity : AppCompatActivity() {
             blockedCount,
             if (isEnabled) getString(R.string.enabled) else getString(R.string.disabled)
         )
+
+        val totalAttempts = prefs.getTotalAttemptCount()
+        if (totalAttempts > 0) {
+            totalAttemptsText.text = getString(R.string.total_attempt_count, totalAttempts)
+            totalAttemptsText.visibility = View.VISIBLE
+        } else {
+            totalAttemptsText.visibility = View.GONE
+        }
 
         renderBlockedApps()
         updateAccessibilityButtonVisibility()
@@ -313,8 +323,9 @@ class MainActivity : AppCompatActivity() {
             .mapNotNull { packageName -> resolveAppLabel(packageName) }
             .sortedBy { it.label.lowercase() }
             .forEach { item ->
+                val attemptCount = prefs.getAttemptCount(item.packageName)
                 val chip = Chip(this).apply {
-                    text = item.label
+                    text = if (attemptCount > 0) "${item.label} ($attemptCount)" else item.label
                     isCheckable = false
                     isClickable = false
                     setTextColor(getColor(R.color.text_primary))
